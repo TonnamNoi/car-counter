@@ -1,0 +1,22 @@
+Frame 10: Car ID=5 appears at (400, 250)
+- side = -30000 (above line)
+- First time seeing car 5
+- Store: tracked_objects[5] = {'side': -30000, 'last_time': 10.5}
+- Return False (no count yet)
+
+Frame 11: Car ID=5 at (400, 290)
+- side = -6000 (still above, closer)
+- Check crossed: (-30000) × (-6000) = positive → NO CROSS
+- Update position only
+
+Frame 12: Car ID=5 at (400, 310) ← CROSSES HERE!
+- side = +6000 (now below line!)
+- Check crossed: (-6000) × (+6000) = negative → YES! CROSSED!
+- direction_sign: from negative to positive = -1
+- count_out += 1
+- Return True ✓
+
+Frame 13: Car ID=5 at (400, 330)
+- Time since last = 0.03 seconds
+- Cooldown = 1.0 second
+- 0.03 < 1.0 → Cooldown, Don't count again
