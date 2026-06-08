@@ -55,7 +55,7 @@ Example: ignore small or blurry cars bc it's not 95% sure
 """
 
 # Display settings
-SHOW_LIVE_PREVIEW = False  # Set True to see processing in real-time (slower)
+SHOW_LIVE_PREVIEW = True  # Set True to see processing in real-time (slower)
 SKIP_FRAMES = 1  # Process every N frames (1 = every frame, 2 = every other frame)
 
 print(f"\no Input video: {INPUT_VIDEO}")
@@ -239,7 +239,7 @@ while True:
     if SHOW_LIVE_PREVIEW:
         cv2.imshow('Car Counter', frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
-            print("\n⚠️  Stopped by user")
+            print("\n   Stopped by user")
             break
     
     # Print progress
@@ -266,18 +266,18 @@ cv2.destroyAllWindows()
 processing_time = time.time() - start_time
 
 print("\n" + "="*70)
-print("✅ PROCESSING COMPLETE!")
+print("PROCESSING COMPLETE!")
 print("="*70)
 
 final_stats = counter.get_statistics()
 
-print(f"\n📊 Final Statistics:")
+print(f"\nFinal Statistics:")
 print(f"   Cars IN:          {final_stats['count_in']}")
 print(f"   Cars OUT:         {final_stats['count_out']}")
 print(f"   TOTAL COUNTED:    {final_stats['total']}")
 print(f"   Cars per minute:  {final_stats['cars_per_minute']:.1f}")
 
-print(f"\n⏱️  Processing Info:")
+print(f"\nProcessing Info:")
 print(f"   Total frames:     {total_frames}")
 print(f"   Processed frames: {processed_count}")
 print(f"   Processing time:  {processing_time:.1f} seconds")

@@ -23,10 +23,39 @@ class Geometry:
         x2, y2 = line_end
         return (x2 - x1) * (y - y1) - (y2 - y1) * (x - x1)
     
+    """
+    - Result > 0 → Point on one side
+    - Result < 0 → Point on other side
+    - Result = 0 → Point exactly on line
+
+    Example:
+    Line from (100, 300) to (700, 300)
+    Car at (400, 250)
+
+    Calculation:
+    (700-100) * (250-300) - (300-300) * (400-100)
+    = 600 * (-50) - 0 * 300
+    = -30000
+
+    Result: -30000 (negative) = car is ABOVE the line
+    """
+    
     @staticmethod
     def crossed(previous_side: float, current_side: float) -> bool:
         #Check if point crossed the line (sides have different signs)
         return previous_side * current_side < 0
+    
+    """
+    If both sides positive: (+) x (+) = (+) -> Same side
+    If both sides negative: (-) x (-)  = (+) -> Same side  
+    If different signs: (+) x (-) = (-) -> Cross
+
+    Frame 1: Car side = -30000 (above line)
+    Frame 2: Car side = +15000 (below line)
+
+    Check: -30000 x 15000 = -450000000
+    Result: Negative -> Different signs -> Car crossed
+    """
     
     @staticmethod
     def direction_sign(previous_side: float, current_side: float) -> int:
@@ -35,10 +64,26 @@ class Geometry:
         Returns: +1 for one direction, -1 for opposite, 0 for no crossing
         """
         if previous_side > 0 and current_side < 0:
-            return 1
+            return 1 # From Below to Above: going Up, car IN
         elif previous_side < 0 and current_side > 0:
-            return -1
+            return -1 # From Above to Below: going Down, car OUT
         return 0
+    
+    """
+    Imagine horizontal line
+
+      Negative side (-)
+    --------------------- Line
+      Positive side (+)
+
+    Which computer nomally count position as
+    X increase go Right | Decrease go Left
+    Y increase go Down | Decrease go Up
+
+    - Car going Up: (+) to (-) -> direction: +1 -> count as IN
+    - Car going Down: (-) to (+) -> direction: +1 -> count as OUT
+
+    """
     
     @staticmethod
     def centroid_xyxy(bbox: Tuple[float, float, float, float]) -> Tuple[float, float]:
@@ -59,8 +104,8 @@ class LineCounter:
     Counts vehicles crossing a virtual line with direction tracking
     """
     
-    def __init__(self, 
-                line_start: Tuple[float, float],
+    def __init__(self, # Setup counter with initial value
+                line_start: Tuple[float, float], 
                 line_end: Tuple[float, float],
                 cooldown: float = 1.0):
         """
@@ -71,9 +116,9 @@ class LineCounter:
             line_end: (x, y) end point of counting line
             cooldown: seconds to wait before counting same car again
         """
-        self.line_start = line_start
-        self.line_end = line_end
-        self.cooldown = cooldown
+        self.line_start = line_start # x1, y1
+        self.line_end = line_end     # x2, y2
+        self.cooldown = cooldown     # 1 second
         
         # Count variables
         self.count_in = 0
@@ -109,18 +154,19 @@ class LineCounter:
         
         # First time seeing this car
         if track_id not in self.tracked_objects:
+            # Store car position
             self.tracked_objects[track_id] = {
                 'side': current_side,
                 'last_time': timestamp
             }
-            return False
+            return False # Not count yet
         
         # Get previous state
         previous_state = self.tracked_objects[track_id]
         previous_side = previous_state['side']
         last_time = previous_state['last_time']
         
-        # Check cooldown
+        # Check cooldown to prevent double counting
         time_since_last = timestamp - last_time
         if time_since_last < self.cooldown:
             self.tracked_objects[track_id]['side'] = current_side
